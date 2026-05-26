@@ -1439,7 +1439,7 @@ Evil-WinRM shell v3.9
 Error: Invalid hash format
 ```
 
-I got it now. We got an NTLM hash (confirmed by nxc to be the right one) but to connect to the shell, we only need the LM part : the hash is divided in two parts : `aad3b435b51404eeaad3b435b51404ee` and `cfb106feec8b89a3d98e14dcbe8d087a`, separated by a : which means the NTLM hash can be divided into the NT (the latter part) and LM (the former part) `LM:NT`. The first part of this NTLM hash is a dummy value because LM is disabled. Usually, the NT hash is the one we would be looking for to authenticate via Pass-The-Hash :
+I got it now. We got an NTLM hash (confirmed by nxc to be the right one) but to connect to the shell, we only need the NT part : the hash is divided in two parts : `aad3b435b51404eeaad3b435b51404ee` and `cfb106feec8b89a3d98e14dcbe8d087a`, separated by a : which means the NTLM hash can be divided into the NT (the latter part) and LM (the former part) `LM:NT`. The first part of this NTLM hash is a dummy value because LM is disabled. Usually, the NT hash is the one we would be looking for to authenticate via Pass-The-Hash :
 
 ```PowerShell
 >  evil-winrm -i dc.sendai.vl -u administrator -H 'cfb106feec8b89a3d98e14dcbe8d087a'  
