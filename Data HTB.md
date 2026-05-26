@@ -1,5 +1,7 @@
 Target : 10.129.234.47
 
+Date : 21/05/2026
+
 ```bash
 >  sudo echo "10.129.234.47 data.htb" | sudo tee -a /etc/hosts  
 Please touch the FIDO authenticator.  
