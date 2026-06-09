@@ -663,10 +663,10 @@ We now get to the /share directory and extract from transfer (where we put the U
 >  smbclient //10.129.2.189/share -U 'JULIA.WONG%Computer1' -c 'get transfer\\JULIA.WONG\\user.txt user.txt exit'  
 getting file \transfer\JULIA.WONG\user.txt of size 32 as user.txt (0.1 KiloBytes/sec) (average 0.1 KiloBytes/sec)  
 >  cat user.txt  
-55d33e52bc5fa7a687b9f0dcfa103dda%
+55d33e52**************cfa103dda%
 ```
 
-We remove the dirty % and we got the user flag : 55d33e52bc5fa7a687b9f0dcfa103dda
+We remove the dirty % and we got the user flag : 55d33*************03dda
 
 Now, we'll get into Julia Wong's computer, trying to find ways to privesc.
 
@@ -1218,7 +1218,7 @@ And we read it :
 
 ```bash
 >  cat root.txt  
-fc98f418f94f8cdb9a30ef026fe64345%
+fc98f41**********e64345%
 ```
 
-Root flag : fc98f418f94f8cdb9a30ef026fe64345
+Root flag : fc98f4*************e64345
