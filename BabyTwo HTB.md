@@ -792,7 +792,7 @@ cat user.txt
 getting file \dev\who.txt of size 24 as who.txt (0.1 KiloBytes/sec) (average 0.1 KiloBytes/sec)  
 getting file \dev\user.txt of size 32 as user.txt (0.1 KiloBytes/sec) (average 0.1 KiloBytes/sec)  
 baby2\amelia.griffiths  
-42783b2c1483aeb70eca6810f0645c38%
+42783b************5c38%
 ```
 
 And fuck you PowerShell, we got the user flag and the user : amelia.griffiths.
@@ -985,7 +985,7 @@ d-r---         8/22/2023  10:08 AM                Public
   
 *Evil-WinRM* PS C:\Users> cd /Users/Administrator/Desktop  
 *Evil-WinRM* PS C:\Users\Administrator\Desktop> cat root.txt  
-293500962edc31fa154951eeeb5740f9
+2935009**********5740f9
 ```
 
 And rooted !
