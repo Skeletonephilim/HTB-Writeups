@@ -180,7 +180,7 @@ And we get the shell.
 netadmin@wifinetic:~$ ls  
 user.txt  
 netadmin@wifinetic:~$ cat user.txt  
-daba48ac36ba2a6e237eab6d65f08a49
+daba*****************65f08a49
 netadmin@wifinetic:~$ whoami  
 netadmin  
 netadmin@wifinetic:~$ id  
@@ -448,7 +448,7 @@ Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your 
   
 Last login: Tue Sep 12 12:07:58 2023
 root@wifinetic:~# cat root.txt  
-bb6ad8ddf2cbccf29c4d19b6573c7f26
+bb6********************3c7f26
 ```
 
 And we got the root flag.
