@@ -165,7 +165,7 @@ Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplay
 Info: Establishing connection to remote endpoint  
 /usr/share/evil-winrm/vendor/bundle/ruby/3.4.0/gems/rexml-3.4.4/lib/rexml/xpath.rb:67: warning: REXML::XPath.each, REXML::XPath.first, REXML::XPath.match dropped support for nodeset...  
 *Evil-WinRM* PS C:\Users\svc-printer\Documents> type /Users/svc-printer/Desktop/user.txt  
-d36c6666ae0e84663917e2c976162d07
+d3******************2d07
 ```
 
 And we got the User flag.
@@ -432,7 +432,7 @@ type C:\Users\Administrator\Desktop\root.txt > C:\ProgramData\root.txt
   
 C:\Windows\system32>type C:\ProgramData\root.txt  
 type C:\ProgramData\root.txt  
-342f7c8bfb391d273bb874de0ca47077
+34**************a47077
 ```
 
 And we got the root flag.
