@@ -1009,7 +1009,7 @@ SeMachineAccountPrivilege     Add workstations to domain     Enabled
 SeChangeNotifyPrivilege       Bypass traverse checking       Enabled  
 SeIncreaseWorkingSetPrivilege Increase a process working set Enabled
 *Evil-WinRM* PS C:\Users\svc_sspr\Documents> type /Users/svc_sspr/Desktop/user.txt  
-c75ec2885e1b20ec943214b084c7be39
+c75e****************be39
 ```
 
 And we got the user flag !
@@ -1345,7 +1345,7 @@ Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplay
 Info: Establishing connection to remote endpoint  
 *Evil-WinRM* PS C:\Users\Administrator\Documents> cd /Users/Administrator/Desktop  
 *Evil-WinRM* PS C:\Users\Administrator\Desktop> type root.txt  
-fab5fddb1560b06a364a6c4e7a8246b1
+fab5f************246b1
 ```
 
 And we got root on Phantom !
