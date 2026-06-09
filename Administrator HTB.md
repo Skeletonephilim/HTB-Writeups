@@ -719,7 +719,7 @@ Mode                 LastWriteTime         Length Name
   
   
 *Evil-WinRM* PS C:\Users\emily\Desktop> cat user.txt  
-90e524ec3281b808e59a99c6403db793
+90e524*************3db793
 ```
 
 And it is.
@@ -1031,7 +1031,7 @@ Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplay
                                           
 Info: Establishing connection to remote endpoint  
 *Evil-WinRM* PS C:\Users\Administrator\Documents> type C:/Users/Administrator/Desktop/root.txt  
-646709a9987f933149039d8688465298
+6467**********9d8688465298
 ```
 
 And we got root.
