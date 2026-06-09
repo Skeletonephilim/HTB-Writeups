@@ -1142,7 +1142,7 @@ Password: ty8wnW9qCKDosXo6
 
 We arrive on a Windows 10 desktop.
 Of course, my first reflex is to `cd \` and then `del \Windows\System32\` unfortunately permission got denied.
-So we resort to the user.txt on the desktop : 287a234b9ddbc5461a2272bceb5a77f
+So we resort to the user.txt on the desktop : 2***************a77f
 
 On cmd on the RDP session :
 
@@ -1241,5 +1241,5 @@ Then, copy by hand even though `+clipboard` is in the RDP arguments because the 
 C:\Windows\System32>whoami
 nt authority\system
 C:\Windows\System32>type \Users\Administrator\Desktop\root.txt
-54f49496bb6a510b7070bb18995fd5b2
+54f49***************5fd5b2
 ```
