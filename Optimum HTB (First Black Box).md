@@ -100,7 +100,7 @@ Mode              Size    Type  Last modified              Name
 100444/r--r--r--  34      fil   2026-05-26 20:32:50 +0200  user.txt  
   
 meterpreter > cat user.txt  
-c5ba70505492996b1e7c7083ba9f4f21
+c5ba****************a9f4f21
 ```
 
 Found the user flag.
@@ -717,16 +717,9 @@ operable program or batch file.
   
 C:\Users\Administrator\Desktop>type root.txt  
 type root.txt  
-92637427b7d302e824a015ea8ed5b74e  
+926********************8ed5b74e  
   
 C:\Users\Administrator\Desktop>
 ```
 
 And we got root officially on my first black box engagement.
-
-## Flags
-
-```
-user.txt  c5ba70505492996b1e7c7083ba9f4f21
-root.txt  92637427b7d302e824a015ea8ed5b74e
-```
