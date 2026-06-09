@@ -700,7 +700,7 @@ drwxr-xr-x 3 root root   4096 Sep  6  2024 ..
 -rw-r--r-- 1 root root   1794 Sep  6  2024 style.css  
 -r--r--rw- 1 root root     33 Apr  8  2025 user_aeT1xa.txt
 aleks@down:~$ cat /var/www/html/user_aeT1xa.txt  
-d4bc94b386ef7c8113698a8c4951cacd
+d4bc************951cacd
 ```
 
 And we got the user flag.
@@ -719,7 +719,7 @@ This means we are root.
 
 ```bash
 aleks@down:~$ sudo cat /root/root.txt  
-87bb9869a311b8abb5fb4d3c7248fdcb
+87bb9**************fdcb
 ```
 
 And we immediately got the root flag, right after the user flag.
