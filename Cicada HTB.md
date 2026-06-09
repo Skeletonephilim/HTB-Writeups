@@ -320,7 +320,7 @@ Mode                 LastWriteTime         Length Name
   
   
 *Evil-WinRM* PS C:\Users\emily.oscars.CICADA\Documents> type /Users/emily.oscars.CICADA/Desktop/user.txt  
-e187e1d1e87cad2286af6ee2f0deff92
+e187e1d*************deff92
 ```
 
 And we got the user flag.
@@ -419,7 +419,7 @@ Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplay
                                           
 Info: Establishing connection to remote endpoint
 *Evil-WinRM* PS C:\Users\Administrator\Documents> type /Users/Administrator/Desktop/root.txt  
-8b7682a6594cdd31f9d546a8c070e8e7
+8b768*************8e7
 ```
 
 And we got the root flag.
