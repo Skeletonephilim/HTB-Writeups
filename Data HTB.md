@@ -1564,7 +1564,7 @@ Last login: Wed Jun  4 13:37:31 2025 from 10.10.14.62
 boris@data:~$ ls  
 user.txt  
 boris@data:~$ cat user.txt  
-955e5bc886643723d43c7e7be11f5898
+955e*****************5898
 ```
 
 We got the user flag.
@@ -1629,7 +1629,7 @@ And, bingo.
 
 ```bash
 bash-5.1# cat /mnt/root/root.txt  
-82cf16c035f14782c2ccab47060f04ca
+82cf16******************060f04ca
 ```
 
 First Linux Black Box finished and second Black Box engagement finished !
