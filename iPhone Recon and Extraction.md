@@ -118,7 +118,7 @@ And more detailed with `pymobiledevice3 lockdown info` :
    "PairRecordProtectionClass": 4,  
    "PartitionType": "GUID_partition_scheme",  
    "PasswordProtected": false,  
-   "PhoneNumber": "07 45 61 86 53",  
+   "PhoneNumber": "07 ** ** ** 45",  
    "PkHash": "<627ac******************************************************************5>",  
    "ProductName": "iPhone OS",  
    "ProductType": "iPhone17,4",  
